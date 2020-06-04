@@ -6,16 +6,25 @@ const flatted = require('flatted')
 
 const getData = async (ctx, next) => {
   const req = ctx.request.query
-  console.log(req)
-  const resData = await axios.get('https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=5min&apikey=demo')
-  const { data } = resData
-  // console.log(resData.data)
+  const { symbol, interval = 5 } = req
+  let resData = null
+  let message = ''
+  let code = 000 
+  if (symbol) {
+    const res = await axios.get(`https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=${interval}min&apikey=YEDT80X4O75WIFFI`)
+    resData = res.data
+    message = '查询成功'
+  } else {
+    code = 100
+    message = 'symbol不能为空'
+  }
   ctx.status = 200
   ctx.body = {
-    data,
-    code: 000,
-    message: 'success'
+    data: resData,
+    code,
+    message,
   }
+  // console.log(resData.data)
 }
 
 const getCompany = async (ctx, next) => {
